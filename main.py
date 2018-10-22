@@ -7,14 +7,33 @@ import os, sys, shutil
 import math
 import getpass
 
-
 photosFrom = []
 fileEnding = "jpg"
-factor = 128
-metaWidth = 1080
-metaHeight = 1080
-size = factor, factor
 tempFolders = ['./picsProcessed', './pics', './metaImg', './metaImg/small', './picsProcessed/small']
+
+print("wie möchten Sie skalieren? Ganze Zahl zwischen 8 und 160")
+tempFactor = input()
+
+
+print("how many pics? (dont take more than 500 Dude)")
+maxNumPhotos = input()
+
+try:
+    tempFactor = int(tempFactor)
+except:
+    print("Das war ungültig. Es wird auf 128 skaliert")
+    tempFactor = 128
+
+if(tempFactor > 160):
+    tempFactor = 160
+elif(tempFactor <= 16):
+    tempFactor = 16
+else:
+    toSubs = tempFactor % 8
+    tempFactor -= toSubs
+factor = tempFactor
+size = factor, factor
+
 
 
 def black_and_white(input_image_path, output_image_path):
@@ -36,6 +55,11 @@ def scrapeImages():
         else:
             photosFrom.append(lastUser)
             print("Von wem noch? 'Enter' für niemanden mehr")
+    
+    if(len(photosFrom) != 0):
+        maxProAcc = round(maxNumPhotos / len(photosFrom))
+    else:
+        maxProAcc = maxNumPhotos
 
     print("Ihr Username?")
     username = input()
@@ -43,7 +67,7 @@ def scrapeImages():
     password = getpass.getpass('Ihr Password: ')
 
     for i in range(len(photosFrom)):
-        os.system("instagram-scraper " + photosFrom[i] + " -u " + username + " -p " + password + " -t image -d ./pics")
+        os.system("instagram-scraper " + photosFrom[i] + " -m " + str(maxProAcc) + " -u " + username + " -p " + password + " -t image -d ./pics")
 
 
 def blackandwhitethem():
@@ -162,7 +186,7 @@ def chooseRight(pixelToBeFilled, openPicsTupelList):
         else:
             continue
 
-def drawPicture(subPics):
+def drawPicture(subPics, factor):
     
     openImgs = []
     for filename in os.listdir("./picsProcessed/small"):
@@ -240,7 +264,7 @@ subImgs = getSmallImgs()
 
 bestFitsInOrder = checkBestLucid(imgBig, subImgs)
 
-drawPicture(bestFitsInOrder)
+drawPicture(bestFitsInOrder, factor)
 
 delUnused(tempFolders)
 
