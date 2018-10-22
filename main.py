@@ -14,6 +14,8 @@ factor = 128
 metaWidth = 1080
 metaHeight = 1080
 size = factor, factor
+tempFolders = ['./picsProcessed', './pics', './metaImg', './metaImg/small', './picsProcessed/small']
+
 
 def black_and_white(input_image_path, output_image_path):
    color_image = Image.open(input_image_path)
@@ -210,6 +212,17 @@ def delUnused(foldPaths):
             except Exception as e:
                 print(e)
 
+def createFolders(folderPaths):
+    for i in range(len(folderPaths)):
+        path = folderPaths[i]        
+        os.makedirs(path, exist_ok=True)   
+        os.makedirs(path, exist_ok=True)
+        os.makedirs(path, exist_ok=True)
+        os.makedirs(path, exist_ok=True)
+        os.makedirs(path, exist_ok=True)
+
+
+createFolders(tempFolders)
 
 scrapeImages()
 
@@ -226,7 +239,6 @@ bestFitsInOrder = checkBestLucid(imgBig, subImgs)
 
 drawPicture(bestFitsInOrder)
 
-tempFolders = ['./picsProcessed', './pics', './metaImg', './metaImg/small', './picsProcessed/small']
 delUnused(tempFolders)
 
 #os.makedirs(path, exist_ok=True) (to create folder)
