@@ -48,7 +48,10 @@ def scrapeImages():
 
 def blackandwhitethem():
     for filename in os.listdir("./pics"):
-        black_and_white("./pics/"+filename, "./picsProcessed/"+filename)
+        if(filename.split(".")[-1] == "jpg"):
+            black_and_white("./pics/"+filename, "./picsProcessed/"+filename)
+        else:
+            continue
 
 def deterFileFormat(filepath):
     fileFormat = filepath.split(".")[-1]
