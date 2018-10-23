@@ -6,17 +6,28 @@ import numpy as np
 import os, sys, shutil
 import math
 import getpass
+from colormath.color_objects import LabColor, XYZColor, sRGBColor
+from colormath.color_diff import delta_e_cie1976
+from colormath.color_conversions import convert_color
+
 
 photosFrom = []
 fileEnding = "jpg"
-tempFolders = ['./picsProcessed', './pics', './metaImg', './metaImg/small', './picsProcessed/small']
+tempFolders = ['./picsProcessed', './picsProcessed/small', './pics', './pics/small','./metaImg', './metaImg/small']
 
 print("wie möchten Sie skalieren? Ganze Zahl zwischen 8 und 160")
 tempFactor = input()
 
+# print("u want the Pic in Colorful? (y/n)")
+# colorfulDeter = input()
+# if(colorfulDeter == "y" or colorfulDeter == "Y"):
+#     colorful = True
+# else:
+#     colorful = False
 
-print("how many pics? (dont take more than 500 Dude)")
-maxNumPhotos = input()
+
+print("how many pics? (dont take more than 1000 Dude)")
+maxNumPhotos = int(input())
 
 try:
     tempFactor = int(tempFactor)
@@ -77,15 +88,20 @@ def blackandwhitethem():
         else:
             continue
 
+def safeInDirec(input_image_path, output_image_path):
+    color_image = Image.open(input_image_path)
+    color_image.save(output_image_path)
+
+
 def deterFileFormat(filepath):
     fileFormat = filepath.split(".")[-1]
     return fileFormat
 
-def loadAndBWMetaImage():
+def loadAndSafeMetaImage():
     print("what should be your Meta/Main Image? Provide File Path")
     metaFp = input()
     fileEnding = deterFileFormat(metaFp)
-    black_and_white(metaFp, "./metaImg/metaimg."+fileEnding)
+    safeInDirec(metaFp, "./metaImg/metaimg."+fileEnding)
 
 
 def scaleImgsToFactor(direcIn, direcOut):
@@ -101,15 +117,15 @@ def scaleImgsToFactor(direcIn, direcOut):
 
 def getSmallImgs():
     listSmallImgs = []
-    for filename in os.listdir("./picsProcessed/small"):
-        listSmallImgs.append("./picsProcessed/small/"+filename)
+    for filename in os.listdir("./pics/small"):
+        listSmallImgs.append("./pics/small/"+filename)
     return listSmallImgs
 
 def getMetaImg():
     metaImgPath = "./metaImg/small/metaimg.jpg"
     return metaImgPath
 
-def getPxlBr(img):
+def getColorList(img):
     imgB = Image.open(img)
     pixels = imgB.load() # this is not a list, nor is it list()'able
     width, height = imgB.size
@@ -120,29 +136,28 @@ def getPxlBr(img):
             cpixel = pixels[x, y]
             all_pixels.append(cpixel)
     
-    tupl = [(i,i,i) for i in all_pixels]
+    #tupl = [(i,i,i) for i in all_pixels]
 
-    metaImgBrList = []
+    return all_pixels    
 
-    for i in range(len(tupl)):
-        metaImgBrList.append(getBrightness(tupl[i]))
 
-    return metaImgBrList
-
-def getAvgBrightness(img):
-    listMetaBr = getPxlBr(img)
-    return sum(listMetaBr) / len(listMetaBr)
-
-def getBrightness(pixel):
-    R = pixel[0]
-    G = pixel[1]
-    B = pixel[2]
-    brtn = (0.2126*R + 0.7152*G + 0.0722*B)
-    return brtn
-
-def matchPicToPixl(pxlList, picList):
+def getAvgColor(img):
+    listMetaCol = getColorList(img)
     
-    
+    r, g, b = (0, 0, 0)
+
+    for i in range(len(listMetaCol)):
+        r += listMetaCol[i][0]
+        g += listMetaCol[i][1]
+        b += listMetaCol[i][2]
+
+    r = r / len(listMetaCol)
+    g = g / len(listMetaCol)
+    b = b / len(listMetaCol)
+    return (r, g, b)
+
+
+def matchPicToPixlByBrightness(pxlList, picList):   
     closestMatches = []
     for i in range(len(pxlList)):
         clsMI = 256.0
@@ -154,28 +169,69 @@ def matchPicToPixl(pxlList, picList):
 
         closestMatches.append(closestMatch)
         
-    #print(closestMatches[100])
-
     return closestMatches
 
 
-def checkBestLucid(imgBig, subImgs):
+def turnToLabColors(pixelList):
+    if (type(pixelList[0][0]) != tuple):
+        labColorList = []
+        for i in range(len(pixelList)):
+            rgb = sRGBColor(pixelList[i][0], pixelList[i][1], pixelList[i][2], is_upscaled = True)
+            lab = convert_color(rgb, LabColor)
+            labColorList.append(lab)
+        
+        print(len(pixelList))
+        print(len(labColorList))
+        return labColorList
+    else:
+        labColorList = []
+        for i in range(len(pixelList)):
+            rgb = sRGBColor(pixelList[i][0][0], pixelList[i][0][1], pixelList[i][0][2], is_upscaled = True)
+            lab = convert_color(rgb, LabColor)
+            labColorList.append((lab, pixelList[i][1]))
+        
+        print(len(pixelList))
+        print(len(labColorList))
+        return labColorList
+
+def matchPicToPixlByColor(pxlList, picList):
+    pxlListLab = turnToLabColors(pxlList)
+    picListLab = turnToLabColors(picList)
+
+    closestMatches = []
+    for i in range(len(pxlListLab)):        
+        clsMI = 1000000.0
+        for j in range(len(picListLab)):
+            delta_e = delta_e_cie1976(pxlListLab[i], picListLab[j][0])
+            if(delta_e < clsMI):
+                closestMatch = picListLab[j][1]
+                clsMI = delta_e
+
+        closestMatches.append(closestMatch)
     
-    listMetaBr = getPxlBr(imgBig)
+    print(len(closestMatches))
+        
+    
+    return closestMatches
 
-    subImgsBrightness = []
 
+
+def checkBestColor(imgBig, subImgs):
+    
+    listMetaColor = getColorList(imgBig)
+
+    subImgsAvgColor = []
     for i in range(len(subImgs)):
-        avgBr = getAvgBrightness(subImgs[i])
+        avgCol = getAvgColor(subImgs[i])
         imgUrl = subImgs[i]
-        tempTpl = (avgBr, imgUrl)
-        subImgsBrightness.append(tempTpl)
-   
-    #print(subImgsBrightness)
+        tempTpl = (avgCol, imgUrl)
+        subImgsAvgColor.append(tempTpl)
 
-    listPicsMatched = matchPicToPixl(listMetaBr, subImgsBrightness)
+    listPicsMatched = matchPicToPixlByColor(listMetaColor, subImgsAvgColor)
 
     return listPicsMatched
+
+
 
 def chooseRight(pixelToBeFilled, openPicsTupelList):
     justName = pixelToBeFilled.split("/")[-1]
@@ -186,11 +242,13 @@ def chooseRight(pixelToBeFilled, openPicsTupelList):
         else:
             continue
 
+
+
 def drawPicture(subPics, factor):
     
     openImgs = []
-    for filename in os.listdir("./picsProcessed/small"):
-        opn = (filename ,Image.open("./picsProcessed/small/"+filename))
+    for filename in os.listdir("./pics/small"):
+        opn = (filename, Image.open("./pics/small/"+filename))
         openImgs.append(opn)
 
     #print(openImgs)
@@ -239,6 +297,8 @@ def delUnused(foldPaths):
             except Exception as e:
                 print(e)
 
+
+
 def createFolders(folderPaths):
     for i in range(len(folderPaths)):
         path = folderPaths[i]        
@@ -248,24 +308,50 @@ def createFolders(folderPaths):
         os.makedirs(path, exist_ok=True)
         os.makedirs(path, exist_ok=True)
 
+def remove_img(path, img_name):
+    os.remove(path + '/' + img_name)
+    # check if file exists or not
+    if os.path.exists(path + '/' + img_name) is False:
+        # file did not exists
+        #return True
+        pass
+
+def cleanToSquares(folder):
+    listWeg = []
+
+    for filename in os.listdir(folder):
+        tempImg = Image.open("./pics/small/"+filename)
+        pixelsTemp = tempImg.load()
+        width, height = tempImg.size
+        if(width != height):
+            remove_img(folder, filename)
+            listWeg.append(True)
+        else:
+            continue
+        
+    print(len(listWeg))
+
+
 
 createFolders(tempFolders)
 
 scrapeImages()
 
 blackandwhitethem()
-loadAndBWMetaImage()
+loadAndSafeMetaImage()
+
+cleanToSquares("./pics/small/")
 
 scaleImgsToFactor("./metaImg/", "./metaImg/small/")
-scaleImgsToFactor("./picsProcessed/", "./picsProcessed/small/")
+scaleImgsToFactor("./pics/", "./pics/small/")
 
 imgBig = getMetaImg()
 subImgs = getSmallImgs()
 
-bestFitsInOrder = checkBestLucid(imgBig, subImgs)
+bestFitsInOrder = checkBestColor(imgBig, subImgs)
 
 drawPicture(bestFitsInOrder, factor)
 
 delUnused(tempFolders)
 
-#os.makedirs(path, exist_ok=True) (to create folder)
+# robbie.exe banksy _naropinosa henriettaharris tays_hipsdontlie
