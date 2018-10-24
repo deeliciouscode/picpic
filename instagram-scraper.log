@@ -1,0 +1,3 @@
+2018-10-24 00:09:35,261 - instagram_scraper.app - ERROR - Login failed for d
+2018-10-24 00:09:35,262 - instagram_scraper.app - ERROR - {"authenticated": false, "user": false, "status": "ok"}
+2018-10-24 00:09:36,578 - instagram_scraper.app - WARNING - Retry after exception PartialContentException('Partial response',) on https://i.instagram.com/api/v1/users/5829296286/info/

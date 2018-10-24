@@ -11,12 +11,10 @@ from colormath.color_diff import delta_e_cie1976
 from colormath.color_conversions import convert_color
 
 
-photosFrom = []
+photosFromAndNum = []
 fileEnding = "jpg"
 tempFolders = ['./picsProcessed', './picsProcessed/small', './pics', './pics/small','./metaImg', './metaImg/small']
 
-print("wie möchten Sie skalieren? Ganze Zahl zwischen 8 und 160")
-tempFactor = input()
 
 # print("u want the Pic in Colorful? (y/n)")
 # colorfulDeter = input()
@@ -25,9 +23,8 @@ tempFactor = input()
 # else:
 #     colorful = False
 
-
-print("how many pics? (dont take more than 1000 Dude)")
-maxNumPhotos = int(input())
+print("wie möchten Sie skalieren? Ganze Zahl zwischen 8 und 160")
+tempFactor = input()
 
 try:
     tempFactor = int(tempFactor)
@@ -48,15 +45,17 @@ size = factor, factor
 
 
 def black_and_white(input_image_path, output_image_path):
-   color_image = Image.open(input_image_path)
-   bw = color_image.convert('L')
-   bw.save(output_image_path)
+    "Takes an Image and returns a Grayscale version"
+    color_image = Image.open(input_image_path)
+    bw = color_image.convert('L')
+    bw.save(output_image_path)
 
 def scrapeImages():
-    
+    "scapes images from instagram by user specification (is interactive)"
     moreUsers = True
+    
 
-    print("Von wem möchen Sie alles die Photos herunter laden?")
+    print("Von wem möchen Sie alles die Photos herunter laden? 'accName -m x' <- x is max number of pics for this account" )
 
     while (moreUsers):
         lastUser = input()
@@ -64,24 +63,20 @@ def scrapeImages():
             moreUsers = False
             break
         else:
-            photosFrom.append(lastUser)
-            print("Von wem noch? 'Enter' für niemanden mehr")
+            photosFromAndNum.append(lastUser)
+            print("Von wem noch? 'Enter' für niemanden mehr 'accName -m x'")
     
-    if(len(photosFrom) != 0):
-        maxProAcc = round(maxNumPhotos / len(photosFrom))
-    else:
-        maxProAcc = maxNumPhotos
-
     print("Ihr Username?")
     username = input()
 
     password = getpass.getpass('Ihr Password: ')
 
-    for i in range(len(photosFrom)):
-        os.system("instagram-scraper " + photosFrom[i] + " -m " + str(maxProAcc) + " -u " + username + " -p " + password + " -t image -d ./pics")
+    for i in range(len(photosFromAndNum)):
+        os.system("instagram-scraper " + photosFromAndNum[i] + " -u " + username + " -p " + password + " -t image -d ./pics")
 
 
 def blackandwhitethem():
+    "Takes all Pictures from ./pics, grayscales them and safes them in ./picsProcessed"
     for filename in os.listdir("./pics"):
         if(filename.split(".")[-1] == "jpg"):
             black_and_white("./pics/"+filename, "./picsProcessed/"+filename)
@@ -89,15 +84,18 @@ def blackandwhitethem():
             continue
 
 def safeInDirec(input_image_path, output_image_path):
-    color_image = Image.open(input_image_path)
-    color_image.save(output_image_path)
+    "Takes an input path to an image and an output path and safes the image from input in output"
+    image = Image.open(input_image_path)
+    image.save(output_image_path)
 
 
 def deterFileFormat(filepath):
+    "determines the file format of a given file or filepath"
     fileFormat = filepath.split(".")[-1]
     return fileFormat
 
 def loadAndSafeMetaImage():
+    "takes user input that is a filepath and safes that Metaimage (the one that is beeing build) in './metaImg/metaimg'"
     print("what should be your Meta/Main Image? Provide File Path")
     metaFp = input()
     fileEnding = deterFileFormat(metaFp)
@@ -105,6 +103,7 @@ def loadAndSafeMetaImage():
 
 
 def scaleImgsToFactor(direcIn, direcOut):
+    "takes an input path and an output path and scales the image from the input path down to the user determined factor and saves it in the output path"
     for infile in os.listdir(direcIn):
         outfile = os.path.splitext(infile)[0]
         if infile != outfile:
@@ -116,16 +115,19 @@ def scaleImgsToFactor(direcIn, direcOut):
                 print("cannot create thumbnail for '%s'" % infile)
 
 def getSmallImgs():
+    "gives back a list of all small images in './pics/small/'"
     listSmallImgs = []
     for filename in os.listdir("./pics/small"):
         listSmallImgs.append("./pics/small/"+filename)
     return listSmallImgs
 
 def getMetaImg():
+    "gives back the path of the meta image"
     metaImgPath = "./metaImg/small/metaimg.jpg"
     return metaImgPath
 
 def getColorList(img):
+    "takes a path to an image and gives back a list of all the single pixel-colors in order"
     imgB = Image.open(img)
     pixels = imgB.load() # this is not a list, nor is it list()'able
     width, height = imgB.size
@@ -142,6 +144,7 @@ def getColorList(img):
 
 
 def getAvgColor(img):
+    "takes a path to an image and gives back the average color of that image"
     listMetaCol = getColorList(img)
     
     r, g, b = (0, 0, 0)
@@ -157,7 +160,8 @@ def getAvgColor(img):
     return (r, g, b)
 
 
-def matchPicToPixlByBrightness(pxlList, picList):   
+def matchPicToPixlByBrightness(pxlList, picList):
+    "matches the pixel-brightnes of the meta image to the average brightness of the small pictures"   
     closestMatches = []
     for i in range(len(pxlList)):
         clsMI = 256.0
@@ -172,7 +176,30 @@ def matchPicToPixlByBrightness(pxlList, picList):
     return closestMatches
 
 
+def matchPicToPixlByColor(pxlList, picList):
+    "matches the pixel-colors of the meta image to the average color of the small pictures"
+    pxlListLab = turnToLabColors(pxlList)
+    picListLab = turnToLabColors(picList)
+
+    closestMatches = []
+    for i in range(len(pxlListLab)):        
+        clsMI = 1000000.0
+        for j in range(len(picListLab)):
+            delta_e = delta_e_cie1976(pxlListLab[i], picListLab[j][0])
+            if(delta_e < clsMI):
+                closestMatch = picListLab[j][1]
+                clsMI = delta_e
+
+        closestMatches.append(closestMatch)
+    
+    print(len(closestMatches))
+        
+    
+    return closestMatches
+
+
 def turnToLabColors(pixelList):
+    "takes a list of rgb values and returns a list of lab colors (to compare colors)"
     if (type(pixelList[0][0]) != tuple):
         labColorList = []
         for i in range(len(pixelList)):
@@ -194,30 +221,9 @@ def turnToLabColors(pixelList):
         print(len(labColorList))
         return labColorList
 
-def matchPicToPixlByColor(pxlList, picList):
-    pxlListLab = turnToLabColors(pxlList)
-    picListLab = turnToLabColors(picList)
-
-    closestMatches = []
-    for i in range(len(pxlListLab)):        
-        clsMI = 1000000.0
-        for j in range(len(picListLab)):
-            delta_e = delta_e_cie1976(pxlListLab[i], picListLab[j][0])
-            if(delta_e < clsMI):
-                closestMatch = picListLab[j][1]
-                clsMI = delta_e
-
-        closestMatches.append(closestMatch)
-    
-    print(len(closestMatches))
-        
-    
-    return closestMatches
-
-
 
 def checkBestColor(imgBig, subImgs):
-    
+    "takes the meta image and returns "
     listMetaColor = getColorList(imgBig)
 
     subImgsAvgColor = []
@@ -234,6 +240,7 @@ def checkBestColor(imgBig, subImgs):
 
 
 def chooseRight(pixelToBeFilled, openPicsTupelList):
+    "takes a pixel and all possible pictures and returns the matching image for that pixel"
     justName = pixelToBeFilled.split("/")[-1]
     for i in range(len(openPicsTupelList)):
         if (justName in openPicsTupelList[i][0]):
@@ -245,7 +252,7 @@ def chooseRight(pixelToBeFilled, openPicsTupelList):
 
 
 def drawPicture(subPics, factor):
-    
+    "draws the image based on the smallPics provided and the user defined factor"
     openImgs = []
     for filename in os.listdir("./pics/small"):
         opn = (filename, Image.open("./pics/small/"+filename))
@@ -286,6 +293,7 @@ def drawPicture(subPics, factor):
 
 
 def delUnused(foldPaths):
+    "deletes all images that were used to generate the metapicture"
     for i in range(len(foldPaths)):
         folder = foldPaths[i]
         for the_file in os.listdir(folder):
@@ -300,6 +308,7 @@ def delUnused(foldPaths):
 
 
 def createFolders(folderPaths):
+    "creates all the necessary folders for the programm to run if not already there"
     for i in range(len(folderPaths)):
         path = folderPaths[i]        
         os.makedirs(path, exist_ok=True)   
@@ -309,6 +318,7 @@ def createFolders(folderPaths):
         os.makedirs(path, exist_ok=True)
 
 def remove_img(path, img_name):
+    "removes the image with the provided name in the provided path"
     os.remove(path + '/' + img_name)
     # check if file exists or not
     if os.path.exists(path + '/' + img_name) is False:
@@ -317,6 +327,7 @@ def remove_img(path, img_name):
         pass
 
 def cleanToSquares(folder):
+    "takes a path to a folder and deletes all images in there"
     listWeg = []
 
     for filename in os.listdir(folder):
