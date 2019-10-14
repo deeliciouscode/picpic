@@ -42,8 +42,6 @@ else:
 factor = tempFactor
 size = factor, factor
 
-
-
 def black_and_white(input_image_path, output_image_path):
     "Takes an Image and returns a Grayscale version"
     color_image = Image.open(input_image_path)
@@ -55,7 +53,7 @@ def scrapeImages():
     moreUsers = True
     
 
-    print("Von wem möchen Sie alles die Photos herunter laden? 'accName -m x' <- x is max number of pics for this account" )
+    print("Jana frägt: Von wem möchen Sie alles die Photos herunter laden? 'accName -m x' <- x is max number of pics for this account" )
 
     while (moreUsers):
         lastUser = input()
@@ -348,7 +346,7 @@ createFolders(tempFolders)
 
 scrapeImages()
 
-blackandwhitethem()
+#blackandwhitethem()
 loadAndSafeMetaImage()
 
 cleanToSquares("./pics/small/")
@@ -365,4 +363,4 @@ drawPicture(bestFitsInOrder, factor)
 
 delUnused(tempFolders)
 
-# robbie.exe banksy _naropinosa henriettaharris tays_hipsdontlie
+# robbie.exe banksy _naropinosa henriettaharris
