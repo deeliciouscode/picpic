@@ -1,7 +1,13 @@
-./metaImg/*
+metaImg/
+metaImg/*
 
-./pics/*
+pics/
+pics/*
 
-./picsProcessed/*
+picsProcessed/
+picsProcessed/*
 
+venv/
+venv/*
 
+instagram-scraper.log
