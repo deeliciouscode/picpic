@@ -5,6 +5,7 @@
             <div v-if="imgIds.length">
                 <img :src="getLink()">
                 <button class="btn btn-primary" v-on:click="composeMosaic">select this one</button>
+                <button class="btn btn-primary" v-on:click="index--">prev</button>
                 <button class="btn btn-primary" v-on:click="index++">next</button>
             </div>
         </div>
@@ -34,7 +35,7 @@ export default {
         },
         composeMosaic() {
             const payload = {
-                id: this.imgIds[this.index],
+                id: '69455642_169771750841605_1747183850796859043_n.jpg',
             };
             const path = 'http://localhost:5000/composemosaic';
             axios

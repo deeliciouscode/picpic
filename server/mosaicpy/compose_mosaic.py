@@ -8,12 +8,15 @@ from colormath.color_objects import LabColor, XYZColor, sRGBColor
 from colormath.color_diff import delta_e_cie1976
 from colormath.color_conversions import convert_color
 
+img_path = "./img/pics/"
+factorMeta = 60
+factorSub = 30
 
 def compose_and_safe_mosaic(id):
-    imgBig = "./img/pics/"+id
+    imgBig = img_path+id
     subImgs = get_sub_imgs()
     matches = checkBestColor(imgBig, subImgs)
-    drawPicture(matches, 80, 50)
+    drawPicture(matches, factorMeta, factorSub)
 
 
 def checkBestColor(imgBig, subImgs):
@@ -33,12 +36,12 @@ def checkBestColor(imgBig, subImgs):
 
 def getColorList(img):
     "takes a path to an image and gives back a list of all the single pixel-colors in order"
-    sizeMeta = 80,80
+    sizeMeta = factorMeta, factorMeta
     imgB = Image.open(img)
     imgB.thumbnail(sizeMeta)
     pixels = imgB.load() # this is not a list, nor is it list()'able
     width, height = imgB.size
-    print("###############", width, height)
+    # print("###############", width, height)
     all_pixels = []
     for x in range(width):
         for y in range(height):
@@ -79,13 +82,10 @@ def matchPicToPixlByColor(pxlList, picList):
                 closestMatch = picListLab[j][1]
                 clsMI = delta_e
 
-        closestMatches.append(closestMatch)
-    
-    print(len(closestMatches))
-        
-    
+        closestMatches.append(closestMatch)    
     return closestMatches
 
+# TODO: get rid of if else
 def turnToLabColors(pixelList):
     "takes a list of rgb values and returns a list of lab colors (to compare colors)"
     if (type(pixelList[0][0]) != tuple):
@@ -95,8 +95,8 @@ def turnToLabColors(pixelList):
             lab = convert_color(rgb, LabColor)
             labColorList.append(lab)
         
-        print(len(pixelList))
-        print(len(labColorList))
+        # print(len(pixelList))
+        # print(len(labColorList))
         return labColorList
     else:
         labColorList = []
@@ -105,16 +105,16 @@ def turnToLabColors(pixelList):
             lab = convert_color(rgb, LabColor)
             labColorList.append((lab, pixelList[i][1]))
         
-        print(len(pixelList))
-        print(len(labColorList))
+        # print(len(pixelList))
+        # print(len(labColorList))
         return labColorList
 
 def drawPicture(subPics, factorMeta, factorSub):
     "draws the image based on the smallPics provided and the user defined factor"
-    openImgs = []
-    for filename in os.listdir("./img/pics/small"):
-        opn = (filename, Image.open("./img/pics/small/"+filename))
-        openImgs.append(opn)
+    all_imgs = []
+    for filename in os.listdir(img_path+"small"):
+        opn = (filename, (img_path+"small/"+filename))
+        all_imgs.append(opn)
 
     #print(openImgs)
     #images = map(Image.open, subPics)
@@ -129,8 +129,10 @@ def drawPicture(subPics, factorMeta, factorSub):
     for im in range(factorMeta):
         for jim in range(factorMeta):
             try:
-                rightPic = chooseRight(subPics[im + jim * factorSub], openImgs)
-                new_im.paste(rightPic[1], (x_offset,y_offset))
+                matchingImg = chooseImg(subPics[im + jim * factorSub], all_imgs)
+                img = Image.open(matchingImg[1])
+                new_im.paste(img, (x_offset,y_offset))
+                img.close()
                 x_offset += factorSub
             except IndexError as ie:
                 print(ie)
@@ -141,7 +143,7 @@ def drawPicture(subPics, factorMeta, factorSub):
     
     new_im.save('./img/final/final.jpg')
 
-def chooseRight(pixelToBeFilled, openPicsTupelList):
+def chooseImg(pixelToBeFilled, openPicsTupelList):
     "takes a pixel and all possible pictures and returns the matching image for that pixel"
     justName = pixelToBeFilled.split("/")[-1]
     for i in range(len(openPicsTupelList)):
@@ -154,6 +156,12 @@ def chooseRight(pixelToBeFilled, openPicsTupelList):
 def get_sub_imgs():
     "returns a list of all small images in './pics/small/'"
     sub_imgs = []
-    for filename in os.listdir("./img/pics/small"):
-        sub_imgs.append("./img/pics/small/"+filename)
+    for filename in os.listdir(img_path+"small"):
+        sub_imgs.append(img_path+"small/"+filename)
     return sub_imgs
+
+
+# For faster testing
+if(__name__ == "__main__"):
+    img_path = "../img/pics/"
+    compose_and_safe_mosaic("69455642_169771750841605_1747183850796859043_n.jpg")
