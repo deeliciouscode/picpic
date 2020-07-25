@@ -6,15 +6,17 @@ Vue.use(Vuex);
 export default new Vuex.Store({
     state: {
         user: {
-            username: 'some user',
-            password: 'some password',
+            username: 'some_user',
+            password: 'some_password',
         },
         instaTags: [],
         imgLoadLocationStatus: '',
+        imgIds: [],
     },
     getters: {
         instaTags: (state) => state.instaTags,
         creds: (state) => state.user,
+        imgIds: (state) => state.imgIds,
     },
     mutations: {
         addTag(state, payload) {
@@ -33,6 +35,11 @@ export default new Vuex.Store({
         },
         imgLoadLocationStatus(state, payload) {
             state.imgLoadLocationStatus = payload.imgLoadLocationStatus;
+        },
+        addImgIds(state, payload) {
+            // eslint-disable-next-line
+            console.log("ids:", payload.imgIds)
+            state.imgIds = payload.imgIds;
         },
     },
     actions: {},

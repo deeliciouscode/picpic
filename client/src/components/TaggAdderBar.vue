@@ -67,10 +67,37 @@ export default {
                     const { data } = res;
                     this.$store.commit({
                         type: 'imgLoadLocationStatus',
-                        imgLoadLocationStatus: data.location,
+                        imgLoadLocationStatus: data.Location,
                     });
+                    const interval = setInterval(() => {
+                        axios
+                            .get(`http://localhost:5000${this.$store.state.imgLoadLocationStatus}`)
+                            .then((resp) => {
+                                if (resp.status === 200) {
+                                    this.getImageIdsFromServer();
+                                    clearInterval(interval);
+                                }
+                            })
+                            .catch((err) => {
+                                // eslint-disable-next-line
+                                console.log(err);
+                            });
+                    }, 3000);
+                })
+                .catch((error) => {
                     // eslint-disable-next-line
-                    console.log(this.$store.state.imgLoadLocationStatus);
+                    console.log(error);
+                });
+        },
+        getImageIdsFromServer() {
+            const path = 'http://localhost:5000/getimgids';
+            axios
+                .get(path)
+                .then((res) => {
+                    this.$store.commit({
+                        type: 'addImgIds',
+                        imgIds: res.data.ids,
+                    });
                 })
                 .catch((error) => {
                     // eslint-disable-next-line
@@ -93,7 +120,7 @@ export default {
   max-width: 300px;
   position: absolute;
   padding: 30px;
-  left: 30px;
+  left: 730px;
   width: 100%;
 }
 
