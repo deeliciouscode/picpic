@@ -13,7 +13,8 @@ import requests
 img_folders = [
             './img/pics', 
             './img/pics/small',
-            './img/final'
+            './img/final',
+            './img/pics/meta'
             ]
 
 tasks = {}

@@ -35,7 +35,7 @@ export default {
         },
         composeMosaic() {
             const payload = {
-                id: '69455642_169771750841605_1747183850796859043_n.jpg',
+                id: this.imgIds[this.index],
             };
             const path = 'http://localhost:5000/composemosaic';
             axios

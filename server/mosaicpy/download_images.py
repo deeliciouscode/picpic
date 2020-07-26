@@ -12,7 +12,7 @@ def scrape_images(username, password, tags):
     print(username, password, tags)
     for i in range(len(tags)):
         # here maybe update task status
-        os.system("instagram-scraper " + tags[i]["tag"] + " -u " + username + " -p " + password + " -t image -d ./img/pics")
+        os.system("instagram-scraper " + tags[i]["tag"] + " -m 100" + " -u " + username + " -p " + password + " -t image -d ./img/pics")
 
 
 def scale_images():
