@@ -1,13 +1,18 @@
 <template lang="html">
 
-    <section class="large-image">
-        <div class="frame">
-            <div v-if="imgIds.length">
-                <img :src="getLink()">
-                <button class="btn btn-primary" v-on:click="composeMosaic">select this one</button>
-                <button class="btn btn-primary" v-on:click="index--">prev</button>
-                <button class="btn btn-primary" v-on:click="index++">next</button>
+    <section v-if="imgIds.length" class="large-image frame">
+        <img :src="getLink()" v-on:click="composeMosaic"
+             @mouseover="hover = true"
+             @mouseleave="hover = false">
+        <span v-if="hover">This is a secret message.</span>
+        <div class="columns is-vcentered custom-image-bar">
+            <b-button rounded v-on:click="prevImg"><i class="fa fa-arrow-circle-left"
+                                                      aria-hidden="true"></i></b-button>
+            <div class="column" v-for="img in getSmallImgs()" :key="img">
+                <img :src="getSmallImgLink(img)" v-on:click="setLargeImg(img)">
             </div>
+            <b-button rounded v-on:click="nextImg"><i class="fa fa-arrow-circle-right"
+                                                      aria-hidden="true"></i></b-button>
         </div>
     </section>
 
@@ -26,16 +31,44 @@ export default {
     data() {
         return {
             index: 0,
+            largeImgId: '',
+            indexSmallImgs: 0,
+            hover: false,
         };
     },
     methods: {
-        getLink() {
-            const id = this.imgIds[this.index];
+        setLargeImg(id) {
+            this.largeImgId = id;
+        },
+        getSmallImgLink(id) {
             return `http://localhost:5000/largeimgbyid/${id}`;
+        },
+        getSmallImgs() {
+            return this.imgIds.slice(this.index, this.index + 5);
+        },
+        nextImg() {
+            if (this.index === this.imgIds.length - 1) {
+                this.index = 0;
+            } else {
+                this.index += 4;
+            }
+        },
+        prevImg() {
+            if (this.index === 0) {
+                this.index = this.imgIds.length - 1;
+            } else {
+                this.index -= 4;
+            }
+        },
+        getLink() {
+            if (this.largeImgId === '') {
+                [this.largeImgId] = this.imgIds;
+            }
+            return `http://localhost:5000/largeimgbyid/${this.largeImgId}`;
         },
         composeMosaic() {
             const payload = {
-                id: this.imgIds[this.index],
+                id: this.largeImgId,
             };
             const path = 'http://localhost:5000/composemosaic';
             axios
@@ -78,20 +111,21 @@ export default {
 </script>
 
 <style scoped>
-  .large-image {
-      padding: 30px;
-  }
+
+.custom-image-bar{
+    margin-top: auto;
+}
 
   .frame {
       float: left;
       position: relative;
-      width: 400px;
-      height: 400px;
+      height: 900px;
+      width: 600px;
   }
 
   img {
-    width: 700px;
-    height: 700px;
+    width: 100%;
+    height: 60%;
     object-fit: cover;
     border-radius: 5px;
   }

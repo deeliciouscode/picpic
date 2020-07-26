@@ -30,15 +30,13 @@ export default new Vuex.Store({
         },
         updateCreds(state, payload) {
             state.user = payload.creds;
-            // eslint-disable-next-line
-            alert("Your Username us now set to " +  state.user.username)
         },
         imgLoadLocationStatus(state, payload) {
             state.imgLoadLocationStatus = payload.imgLoadLocationStatus;
         },
         addImgIds(state, payload) {
             // eslint-disable-next-line
-            console.log("ids:", payload.imgIds)
+            // console.log("ids:", payload.imgIds)
             state.imgIds = payload.imgIds;
         },
     },

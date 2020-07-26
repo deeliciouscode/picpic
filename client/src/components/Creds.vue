@@ -1,44 +1,22 @@
 <template lang="html">
     <!-- TODO: v-on.submit.prevent to not reload the page! -->
-    <section class="creds">
-        <link rel="stylesheet"
-              href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <section class="creds frame">
+
         <form v-on:submit.prevent="updateCreds">
-            <div class="form-group row">
-                <div class="col-12">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <div class="input-group-text">
-                                <i class="fa fa-instagram"></i>
-                            </div>
-                        </div>
-                        <input v-model.lazy="instaTag" id="text"
-                               name="text" placeholder="Your Instagram Name"
-                               type="text" class="form-control" required="required">
-                    </div>
-                </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-12">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <div class="input-group-text">
-                                <i class="fa fa-lock"></i>
-                            </div>
-                        </div>
-                        <input v-model.lazy="instaPw" id="insta_password" name="insta_password"
-                               placeholder="Your Password" type="password"
-                               class="form-control" required="required">
-                    </div>
-                </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-12">
-                    <button name="submit" type="submit" class="btn btn-primary">
-                        Submit
-                    </button>
-                </div>
-            </div>
+            <b-field label="Instagram Tag"
+                     label-position="inside"
+                     :type="tagType"
+                     :message="tagMsg">
+                <b-input v-model.lazy="instaTag" maxlength="30"></b-input>
+            </b-field>
+
+            <b-field label="Password"
+                     label-position="inside"
+                     :type="pwType"
+                     :message="pwMsg">
+                <b-input v-model.lazy="instaPw" type="password" maxlength="30"></b-input>
+            </b-field>
+            <b-button @click="updateCreds">Submit</b-button>
         </form>
 
     </section>
@@ -55,18 +33,39 @@ export default {
     },
     data() {
         return {
-
+            instaTag: '',
+            instaPw: '',
+            tagMsg: '',
+            tagType: 'is-light',
+            pwMsg: '',
+            pwType: 'is-light',
         };
     },
     methods: {
         updateCreds() {
-            this.$store.commit({
-                type: 'updateCreds',
-                creds: {
-                    username: this.instaTag,
-                    password: this.instaPw,
-                },
-            });
+            if (this.instaTag === '' || this.instaTag === undefined) {
+                this.tagType = 'is-warning';
+                this.tagMsg = 'You need to type your user tag';
+            } else {
+                this.tagType = 'is-success';
+                this.tagMsg = '';
+            }
+
+            if (this.instaPw === '' || this.instaPw === undefined) {
+                this.pwType = 'is-warning';
+                this.pwMsg = 'You need to enter your password';
+            } else {
+                this.pwType = 'is-success';
+                this.pwMsg = '';
+                this.$store.commit({
+                    type: 'updateCreds',
+                    creds: {
+                        username: this.instaTag,
+                        password: this.instaPw,
+                    },
+                });
+                this.$buefy.notification.open(`Your Username us now set to ${this.$store.state.user.username}`);
+            }
         },
     },
     computed: {
@@ -77,11 +76,13 @@ export default {
 </script>
 
 <style scoped>
+.frame {
+      float: left;
+      position: relative;
+      height: 900px;
+      width: 300px;
+  }
+
 .creds {
-    max-width: 300px;
-    position: absolute;
-    padding: 30px;
-    right: 30px;
-    width: 100%;
 }
 </style>

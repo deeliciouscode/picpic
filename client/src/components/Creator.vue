@@ -1,9 +1,19 @@
 <template lang="html">
 
-    <section class="creator">
-        <LargeImage/>
-        <TaggAdderBar />
-        <Creds />
+    <section class="creator level">
+        <div class="level-left">
+            <div class="level-item">
+                <LargeImage id="large-img-comp"/>
+            </div>
+            <div class="level-item">
+                <TaggAdderBar id="tag-adder-comp"/>
+            </div>
+        </div>
+
+        <!-- Right side -->
+        <div class="level-right">
+            <Creds id="creds-comp"/>
+        </div>
     </section>
 
 </template>
@@ -41,5 +51,20 @@ export default {
 
 <style scoped>
 .creator {
+    padding: 25px;
+}
+
+#large-img-comp {
+}
+
+#tag-adder-comp {
+  max-width: 300px;
+  width: 100%;
+}
+
+#creds-comp {
+    max-width: 300px;
+    position: relative;
+    width: 100%;
 }
 </style>

@@ -1,35 +1,26 @@
 <template lang="html">
 
     <section class="tagg-adder-bar">
-        <link rel="stylesheet"
-              href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <div class="frame">
+            <ul id="added_tags_list">
+                <li v-for="item in instaTags" :key="item.tag" class="tag_item">
+                    {{ item.tag }}
+                </li>
+            </ul>
 
-        <ul id="added_tags_list">
-            <li v-for="item in instaTags" :key="item.tag" class="tag_item">
-                {{ item.tag }}
-            </li>
-        </ul>
-
-        <form v-on:submit.prevent="addTag">
-            <div class="form-group row">
-                <div class="col-12">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <div class="input-group-text">
-                                <i class="fa fa-instagram"></i>
-                            </div>
-                        </div>
+            <form v-on:submit.prevent="addTag">
+                <div class="form-group row">
+                    <div class="col-12">
                         <input v-model.lazy="nextInstaTag" id="tag_adder" name="tag_adder"
-                               placeholder="add insta handle"
+                               placeholder="+ add insta handle"
                                type="text" class="form-control">
                     </div>
                 </div>
-            </div>
-        </form>
+            </form>
 
-        <button class="btn btn-primary" v-on:click="loadImages">Load Images</button>
+            <b-button @click="loadImages">Submit</b-button>
+        </div>
     </section>
-
 </template>
 
 <script lang="js">
@@ -43,7 +34,7 @@ export default {
     },
     data() {
         return {
-
+            nextInstaTag: '',
         };
     },
     methods: {
@@ -116,12 +107,14 @@ export default {
 </script>
 
 <style scoped>
+.frame {
+      float: left;
+      position: relative;
+      height: 900px;
+      width: 300px;
+  }
+
 .tagg-adder-bar {
-  max-width: 300px;
-  position: absolute;
-  padding: 30px;
-  left: 730px;
-  width: 100%;
 }
 
 #added_tags_list {
@@ -133,7 +126,7 @@ export default {
   background-color: rgb(255, 255, 255);
   width: min-content;
   padding: 1px 3px 1px 3px;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
   border-radius: 5px;
 }
 </style>

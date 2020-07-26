@@ -16,7 +16,7 @@ def scrape_images(username, password, tags):
 
 
 def scale_images():
-    size = 50, 50
+    size = 40, 40
     in_dir = "./img/pics/"
     out_dir = "./img/pics/small/"
     for in_file in os.listdir(in_dir):
