@@ -9,6 +9,7 @@ import uuid
 from flask_cors import CORS
 from mosaicpy import *
 import requests
+import shutil
 
 img_folders = [
             './img/pics', 
@@ -90,13 +91,14 @@ def async_api(wrapped_function):
         return {'Location': url_for('gettaskstatus', task_id=task_id)}, 202
     return new_function
 
-
-
 # sanity check route
 @app.route('/ping', methods=['GET'])
 def ping_pong():
     return jsonify('pong!')
 
+@app.route('/')
+def index():
+    return app.send_static_file('index.html')
 
 @app.route('/nametags', methods=['POST'])
 def nametags():
@@ -104,15 +106,17 @@ def nametags():
     task_info = download_images(post_data)
     return task_info
 
-
 @app.route('/getimgids', methods=['GET'])
 def getimgids():
     ids = get_files_no_dirs("./img/pics")
     return jsonify({"ids": ids})
 
+@app.route('/final/<path:filename>', methods=['GET'])
+def getfinal(filename):
+    return send_from_directory('./img/final', "final-"+filename)
+
 @app.route('/largeimgbyid/<path:filename>')
 def largeimgbyid(filename):
-    print(filename)
     return send_from_directory('./img/pics', filename)
 
 @app.route('/composemosaic', methods=['POST'])
@@ -120,6 +124,18 @@ def init_composemosaic():
     data = request.get_json()
     task_info = composemosaic(data["id"])
     return task_info
+
+@app.route('/cleardata', methods=['POST'])
+def clear_data():
+    what = request.get_json()["what"]
+    if what == 'all':
+        delete_data()
+    return jsonify({"worked": True})
+
+def delete_data():
+    shutil.rmtree('./img')
+    createFolders(img_folders)
+
 
 @async_api
 def composemosaic(id):
@@ -129,9 +145,6 @@ def composemosaic(id):
 def download_images(post_data):
     scrape_and_clean_images(post_data["creds"]["username"], post_data["creds"]["password"], post_data["tags"])
     print("finished downloading and cleaning the images")
-
-
-
 
 class GetTaskStatus(Resource):
     def get(self, task_id):
@@ -147,9 +160,7 @@ class GetTaskStatus(Resource):
             return {'Location': url_for('gettaskstatus', task_id=task_id)}, 202
         return task['return_value']
 
-
 api.add_resource(GetTaskStatus, '/status/<task_id>')
-
 
 if __name__ == '__main__':
     createFolders(img_folders)

@@ -9,15 +9,15 @@ from colormath.color_diff import delta_e_cie1976
 from colormath.color_conversions import convert_color
 
 img_path = "./img/pics/"
-final_path = './img/final/final.jpg'
-factorMeta = 150
+final_path = './img/final/'
+factorMeta = 120
 factorSub = 40
 
 def compose_and_safe_mosaic(id):
     imgBig = createMetaImg(id)
     subImgs = get_sub_imgs()
     matches = checkBestColor(imgBig, subImgs)
-    drawPicture(matches, imgBig)
+    drawPicture(matches, imgBig, id)
     
 
 def createMetaImg(img):
@@ -115,7 +115,7 @@ def turnToLabColors(pixelList):
         return labColorList
 
 # TODO: use actual image width / height for the big image!
-def drawPicture(subPics, imgBig):
+def drawPicture(subPics, imgBig, id):
     "draws the image based on the smallPics provided and the user defined factor"
     all_imgs = []
     for filename in os.listdir(img_path+"small"):
@@ -147,7 +147,8 @@ def drawPicture(subPics, imgBig):
         x_offset += factorSub
         y_offset = 0
     
-    new_im.save(final_path)
+    print(final_path+"final-"+id)
+    new_im.save(final_path+"final-"+id)
 
 def get_sub_imgs():
     "returns a list of all small images in './pics/small/'"
@@ -160,6 +161,6 @@ def get_sub_imgs():
 # For faster testing
 if(__name__ == "__main__"):
     img_path = "../img/pics/"
-    final_path = '../img/final/final.jpg'
+    final_path = '../img/final/'
     # need to insert a valid id there
-    # compose_and_safe_mosaic("93570058_695880524501632_5334775039256825243_n.jpg")
+    compose_and_safe_mosaic("93570058_695880524501632_5334775039256825243_n.jpg")
