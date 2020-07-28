@@ -14,6 +14,8 @@
         <div class="level-right">
             <Creds id="creds-comp"/>
         </div>
+
+        <FileDownloader id="file-downloader-comp"/>
     </section>
 
 </template>
@@ -22,6 +24,7 @@
 import Creds from './Creds.vue';
 import TaggAdderBar from './TaggAdderBar.vue';
 import LargeImage from './LargeImage.vue';
+import FileDownloader from './FileDownloader.vue';
 
 export default {
     name: 'creator',
@@ -29,6 +32,7 @@ export default {
         Creds,
         TaggAdderBar,
         LargeImage,
+        FileDownloader,
     },
     props: [],
     mounted() {
@@ -66,5 +70,13 @@ export default {
     max-width: 300px;
     position: relative;
     width: 100%;
+}
+
+#file-downloader-comp {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    left: 0px;
 }
 </style>

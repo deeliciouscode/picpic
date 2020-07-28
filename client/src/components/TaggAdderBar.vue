@@ -73,7 +73,7 @@ export default {
                                 // eslint-disable-next-line
                                 console.log(err);
                             });
-                    }, 3000);
+                    }, 15000);
                 })
                 .catch((error) => {
                     // eslint-disable-next-line

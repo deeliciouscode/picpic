@@ -12,11 +12,14 @@ export default new Vuex.Store({
         instaTags: [],
         imgLoadLocationStatus: '',
         imgIds: [],
+        mosaicImgId: '',
+        finalIsReady: false,
     },
     getters: {
         instaTags: (state) => state.instaTags,
         creds: (state) => state.user,
         imgIds: (state) => state.imgIds,
+        finalIsReady: (state) => state.finalIsReady,
     },
     mutations: {
         addTag(state, payload) {
@@ -38,6 +41,23 @@ export default new Vuex.Store({
             // eslint-disable-next-line
             // console.log("ids:", payload.imgIds)
             state.imgIds = payload.imgIds;
+        },
+        setMosaicImgId(state, payload) {
+            state.mosaicImgId = payload.mosaicImgId;
+        },
+        toggleMosaicDownload(state) {
+            state.finalIsReady = !state.finalIsReady;
+        },
+        clearData(state) {
+            state.user = {
+                username: 'some_user',
+                password: 'some_password',
+            };
+            state.instaTags = [];
+            state.imgLoadLocationStatus = '';
+            state.imgIds = [];
+            state.mosaicImgId = '';
+            state.finalIsReady = false;
         },
     },
     actions: {},

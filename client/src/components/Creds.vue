@@ -19,11 +19,15 @@
             <b-button @click="updateCreds">Submit</b-button>
         </form>
 
+        <b-button type="is-danger" class="clear-data-button"
+                  @click="clearData">Clear Data</b-button>
+
     </section>
 
 </template>
 
 <script lang="js">
+import axios from 'axios';
 
 export default {
     name: 'creds',
@@ -67,6 +71,18 @@ export default {
                 this.$buefy.notification.open(`Your Username us now set to ${this.$store.state.user.username}`);
             }
         },
+        clearData() {
+            this.$store.commit('clearData');
+            axios
+                .post('http://localhost:5000/cleardata', { what: 'all' })
+                .then(() => {
+                    this.$buefy.notification.open('Your data was deleted!');
+                })
+                .catch((err) => {
+                    // eslint-disable-next-line
+                    console.log(err)
+                });
+        },
     },
     computed: {
 
@@ -82,6 +98,12 @@ export default {
       height: 900px;
       width: 300px;
   }
+
+.clear-data-button {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+}
 
 .creds {
 }
