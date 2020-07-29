@@ -12,10 +12,10 @@ import requests
 import shutil
 
 img_folders = [
-            './img/pics', 
-            './img/pics/small',
-            './img/final',
-            './img/pics/meta'
+            './server/img/pics', 
+            './server/img/pics/small',
+            './server/img/final',
+            './server/img/pics/meta'
             ]
 
 tasks = {}
@@ -108,12 +108,12 @@ def nametags():
 
 @app.route('/getimgids', methods=['GET'])
 def getimgids():
-    ids = get_files_no_dirs("./img/pics")
+    ids = get_files_no_dirs("./server/img/pics")
     return jsonify({"ids": ids})
 
 @app.route('/final/<path:filename>', methods=['GET'])
 def getfinal(filename):
-    return send_from_directory('./img/final', "final-"+filename)
+    return send_from_directory('./img/final', filename)
 
 @app.route('/largeimgbyid/<path:filename>')
 def largeimgbyid(filename):
@@ -133,9 +133,8 @@ def clear_data():
     return jsonify({"worked": True})
 
 def delete_data():
-    shutil.rmtree('./img')
+    shutil.rmtree('./server/img')
     createFolders(img_folders)
-
 
 @async_api
 def composemosaic(id):
@@ -164,7 +163,7 @@ api.add_resource(GetTaskStatus, '/status/<task_id>')
 
 if __name__ == '__main__':
     createFolders(img_folders)
-    app.run()
+    app.run(debug=False, host='0.0.0.0')
 
 
 # class CatchAll(Resource):

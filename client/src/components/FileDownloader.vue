@@ -26,7 +26,7 @@ export default {
     methods: {
         downloadMosaic() {
             axios({
-                url: `http://localhost:5000/final/${this.$store.state.mosaicImgId}`,
+                url: `http://localhost:5000/final/final-${this.$store.state.mosaicImgId}`,
                 method: 'GET',
                 responseType: 'blob',
             }).then((response) => {
