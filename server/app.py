@@ -113,7 +113,7 @@ def getimgids():
 
 @app.route('/final/<path:filename>', methods=['GET'])
 def getfinal(filename):
-    return send_from_directory('./img/final', filename)
+    return send_from_directory('./img/final', "final-"+filename)
 
 @app.route('/largeimgbyid/<path:filename>')
 def largeimgbyid(filename):
