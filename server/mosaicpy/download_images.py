@@ -1,6 +1,8 @@
 import os
 from PIL import Image
 
+img_path = "./server/img/"
+
 def scrape_and_clean_images(username, password, tags):
     scrape_images(username, password, tags)
     clean_to_squares()
@@ -12,13 +14,13 @@ def scrape_images(username, password, tags):
     print(username, password, tags)
     for i in range(len(tags)):
         # here maybe update task status
-        os.system("instagram-scraper " + tags[i]["tag"] + " -m 100" + " -u " + username + " -p " + password + " -t image -d ./img/pics")
+        os.system("instagram-scraper " + tags[i]["tag"] + " -m 100" + " -u " + username + " -p " + password + " -t image -d " + img_path + "pics") # if not in docker ./img/pics
 
 
 def scale_images():
     size = 40, 40
-    in_dir = "./img/pics/"
-    out_dir = "./img/pics/small/"
+    in_dir = img_path+"pics/"
+    out_dir = img_path+"pics/small/"
     for in_file in os.listdir(in_dir):
         out_file = os.path.splitext(in_file)[0]
         if in_file != out_file:
@@ -32,7 +34,7 @@ def scale_images():
 
 def clean_to_squares():
     to_remove = []
-    folder = "./img/pics/"
+    folder = img_path+"pics/"
     for filename in os.listdir(folder):
         if (filename.split(".")[-1].lower == "jpg"):
             image = Image.open(folder+filename)

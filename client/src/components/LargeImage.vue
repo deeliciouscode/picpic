@@ -94,7 +94,7 @@ export default {
                                 // eslint-disable-next-line
                                 console.log(err);
                             });
-                    }, 3000);
+                    }, 5000);
                     // eslint-disable-next-line
                     console.log(res)
                 })

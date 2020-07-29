@@ -8,10 +8,10 @@ from colormath.color_objects import LabColor, XYZColor, sRGBColor
 from colormath.color_diff import delta_e_cie1976
 from colormath.color_conversions import convert_color
 
-img_path = "./img/pics/"
-final_path = './img/final/'
-factorMeta = 120
-factorSub = 40
+img_path = "./server/img/pics/"
+final_path = './server/img/final/'
+factorMeta = 100 # TODO
+factorSub = 30
 
 def compose_and_safe_mosaic(id):
     imgBig = createMetaImg(id)
