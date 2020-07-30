@@ -1,27 +1,26 @@
 <template lang="html">
     <!-- TODO: v-on.submit.prevent to not reload the page! -->
     <section class="creds frame">
+        <div class="wrap-temporary">
+            <form v-on:submit.prevent="updateCreds">
+                <b-field label="Instagram Tag"
+                         label-position="inside"
+                         :type="tagType"
+                         :message="tagMsg">
+                    <b-input v-model.lazy="instaTag" maxlength="30"></b-input>
+                </b-field>
 
-        <form v-on:submit.prevent="updateCreds">
-            <b-field label="Instagram Tag"
-                     label-position="inside"
-                     :type="tagType"
-                     :message="tagMsg">
-                <b-input v-model.lazy="instaTag" maxlength="30"></b-input>
-            </b-field>
-
-            <b-field label="Password"
-                     label-position="inside"
-                     :type="pwType"
-                     :message="pwMsg">
-                <b-input v-model.lazy="instaPw" type="password" maxlength="30"></b-input>
-            </b-field>
-            <b-button @click="updateCreds">Submit</b-button>
-        </form>
-
-        <b-button type="is-danger" class="clear-data-button"
-                  @click="clearData">Clear Data</b-button>
-
+                <b-field label="Password"
+                         label-position="inside"
+                         :type="pwType"
+                         :message="pwMsg">
+                    <b-input v-model.lazy="instaPw" type="password" maxlength="30"></b-input>
+                </b-field>
+                <b-button @click="updateCreds">Submit</b-button>
+                <b-button type="is-danger" class="clear-data-button"
+                          @click="clearData">Clear Data</b-button>
+            </form>
+        </div>
     </section>
 
 </template>
@@ -92,10 +91,14 @@ export default {
 </script>
 
 <style scoped>
+.wrap-temporary {
+    position: relative;
+}
+
 .frame {
       float: left;
       position: relative;
-      height: 900px;
+      height: 600px;
       width: 300px;
   }
 

@@ -122,7 +122,7 @@ export default {
   .frame {
       float: left;
       position: relative;
-      height: 900px;
+      height: 600px;
       width: 600px;
   }
 
