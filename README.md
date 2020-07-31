@@ -6,7 +6,7 @@ Use Pictures from instagram to create a big mosaic picture!
 # How to use?
 1. In root run
     $ docker build .
-    $ docker run -p 5000:5000 <id-from-build>
+    $ docker run -p 5000:5000 {id-from-build}
 
 2. Open a browser and type:
     localhost:5000
